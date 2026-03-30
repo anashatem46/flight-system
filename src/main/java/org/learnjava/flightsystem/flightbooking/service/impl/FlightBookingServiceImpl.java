@@ -1,5 +1,6 @@
 package org.learnjava.flightsystem.flightbooking.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.learnjava.flightsystem.flightbooking.entity.Booking;
 import org.learnjava.flightsystem.flightbooking.repo.BookingRepository;
 import org.learnjava.flightsystem.flightbooking.service.BookingService;
@@ -8,17 +9,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-
+@RequiredArgsConstructor
 @Service
-public class FlightBookingServiceImpl extends BookingService {
+public class FlightBookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
 
 
-    public FlightBookingServiceImpl(BookingRepository bookingRepository) {
-        super();
-        this.bookingRepository = bookingRepository;
-    }
+
     @Override
     public List<Booking> getAllBookings(){
         return bookingRepository.findAll();
