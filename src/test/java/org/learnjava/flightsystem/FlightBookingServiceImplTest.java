@@ -12,8 +12,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +49,28 @@ public class FlightBookingServiceImplTest {
         assertEquals(1, result.size());
         assertEquals("CONFIRMED", result.get(0).getStatus());
         verify(bookingRepository).findAll();
+
+    }
+    @Test
+    void getBookingById_shouldReturnBooking_whenBookingExists() {
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(booking));
+        Optional<Booking> result = flightBookingService.getBookingById(1);
+
+        assertEquals(1,result.get().getId());
+        assertTrue(result.isPresent());
+
+        verify(bookingRepository).findById(1);
+
+    }
+
+    @Test
+    void getBookingById_shouldReturnEmptyOptional_whenBookingNotExists() {
+        when(bookingRepository.findById(99)).thenReturn(Optional.empty());
+        Optional<Booking> result = flightBookingService.getBookingById(99);
+
+        assertTrue(result.isEmpty());
+
+        verify(bookingRepository).findById(99);
 
     }
 
