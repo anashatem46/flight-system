@@ -30,11 +30,7 @@ public class FlightBookingController {
     @GetMapping("/{id}")
     public ResponseEntity<Booking> getBookingById(@PathVariable Integer id){
         Optional<Booking> booking = flightBookingService.getBookingById(id);
-        if(booking.isPresent()){
-            return ResponseEntity.ok(booking.get());
-
-
-        } return ResponseEntity.notFound().build();
+        return booking.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
