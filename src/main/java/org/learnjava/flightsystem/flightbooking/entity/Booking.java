@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
+import org.learnjava.flightsystem.flightbooking.dto.enums.BookingStatus;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -23,8 +24,10 @@ public class Booking {
     @Column(name = "booking_time")
     private Instant bookingTime = Instant.now() ;
 
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    private BookingStatus status;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

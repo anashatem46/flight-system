@@ -1,14 +1,14 @@
 package org.learnjava.flightsystem.flightbooking.service;
 
-import org.learnjava.flightsystem.flightbooking.entity.Booking;
+import org.learnjava.flightsystem.flightbooking.dto.BookingDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface BookingService {
-    List<Booking> getAllBookings();
+    List<BookingDto> getAllBookings();
 
-    Optional<Booking> getBookingById(Integer bookingId);
-    Booking createBooking(Booking booking);
+    Optional<BookingDto> getBookingById(Integer bookingId);
+    BookingDto createBooking(BookingDto bookingDto);
 
 }

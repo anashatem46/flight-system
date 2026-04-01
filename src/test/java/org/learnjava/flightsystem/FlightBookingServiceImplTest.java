@@ -4,6 +4,8 @@ package org.learnjava.flightsystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.learnjava.flightsystem.flightbooking.dto.BookingDto;
+import org.learnjava.flightsystem.flightbooking.dto.enums.BookingStatus;
 import org.learnjava.flightsystem.flightbooking.entity.Booking;
 import org.learnjava.flightsystem.flightbooking.repo.BookingRepository;
 import org.learnjava.flightsystem.flightbooking.service.impl.FlightBookingServiceImpl;
@@ -36,7 +38,7 @@ public class FlightBookingServiceImplTest {
     void setUp() {
         booking = new Booking();
         booking.setId(1);
-        booking.setStatus("CONFIRMED");
+        booking.setStatus(BookingStatus.CONFIRMED);
         booking.setFlightId(101);
         booking.setUserId(5);
     }
@@ -45,20 +47,22 @@ public class FlightBookingServiceImplTest {
     @Test
     void getAllBookings_shouldReturnAllBookings(){
         when(bookingRepository.findAll()).thenReturn(List.of(booking));
-        List<Booking> result = flightBookingService.getAllBookings();
+
+        List<BookingDto> result = flightBookingService.getAllBookings();
+
+
         assertEquals(1, result.size());
-        assertEquals("CONFIRMED", result.get(0).getStatus());
+        assertEquals(BookingStatus.CONFIRMED, result.getFirst().status());
         verify(bookingRepository).findAll();
 
     }
     @Test
     void getBookingById_shouldReturnBooking_whenBookingExists() {
         when(bookingRepository.findById(1)).thenReturn(Optional.of(booking));
-        Optional<Booking> result = flightBookingService.getBookingById(1);
+        Optional<BookingDto> result = flightBookingService.getBookingById(1);
 
-        assertEquals(1,result.get().getId());
-        assertTrue(result.isPresent());
-
+        BookingDto found = result.orElseThrow();
+        assertEquals(1, found.bookingId());
         verify(bookingRepository).findById(1);
 
     }
@@ -66,7 +70,7 @@ public class FlightBookingServiceImplTest {
     @Test
     void getBookingById_shouldReturnEmptyOptional_whenBookingNotExists() {
         when(bookingRepository.findById(99)).thenReturn(Optional.empty());
-        Optional<Booking> result = flightBookingService.getBookingById(99);
+        Optional<BookingDto> result = flightBookingService.getBookingById(99);
 
         assertTrue(result.isEmpty());
 

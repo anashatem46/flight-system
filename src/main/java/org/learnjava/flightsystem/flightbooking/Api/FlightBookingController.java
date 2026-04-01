@@ -2,6 +2,7 @@ package org.learnjava.flightsystem.flightbooking.Api;
 
 
 import lombok.RequiredArgsConstructor;
+import org.learnjava.flightsystem.flightbooking.dto.BookingDto;
 import org.learnjava.flightsystem.flightbooking.entity.Booking;
 import org.learnjava.flightsystem.flightbooking.service.BookingService;
 import org.learnjava.flightsystem.flightbooking.service.impl.FlightBookingServiceImpl;
@@ -23,19 +24,19 @@ public class FlightBookingController {
     }
 
     @GetMapping("/")
-    public List<Booking> getAllBookings(){
+    public List<BookingDto> getAllBookings(){
         return flightBookingService.getAllBookings();
 
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getBookingById(@PathVariable Integer id){
-        Optional<Booking> booking = flightBookingService.getBookingById(id);
+    public ResponseEntity<BookingDto> getBookingById(@PathVariable Integer id){
+        Optional<BookingDto> booking = flightBookingService.getBookingById(id);
         return booking.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Booking> createBooking(@RequestBody Booking booking){
-        Booking saveBooking = flightBookingService.createBooking(booking);
+    public ResponseEntity<BookingDto> createBooking(@RequestBody BookingDto bookingDto){
+        BookingDto saveBooking = flightBookingService.createBooking(bookingDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saveBooking);
     }
 
