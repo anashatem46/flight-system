@@ -1,6 +1,7 @@
 package org.learnjava.flightsystem.flightbooking.Api;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.learnjava.flightsystem.flightbooking.dto.BookingDto;
 import org.learnjava.flightsystem.flightbooking.entity.Booking;
@@ -29,16 +30,17 @@ public class FlightBookingController {
 
     }
     @GetMapping("/{id}")
-    public ResponseEntity<BookingDto> getBookingById(@PathVariable Integer id){
+    public ResponseEntity<BookingDto> getBookingById(@Valid @PathVariable Integer id){
         Optional<BookingDto> booking = flightBookingService.getBookingById(id);
         return booking.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<BookingDto> createBooking(@RequestBody BookingDto bookingDto){
+    public ResponseEntity<BookingDto> createBooking(@Valid @RequestBody BookingDto bookingDto){
         BookingDto saveBooking = flightBookingService.createBooking(bookingDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saveBooking);
     }
+
 
 
 }

@@ -51,18 +51,6 @@ public class FlightBookingServiceImpl implements BookingService {
         if(bookingDto == null){
             throw new IllegalArgumentException("Booking must not be null");
         }
-        if (bookingDto.userId()==null){
-            throw new IllegalArgumentException("User id is required");
-
-        }
-        if (bookingDto.flightId() == null){
-            throw new IllegalArgumentException("Flight id is required");
-
-        }
-        if (bookingDto.status() == null){
-            throw new IllegalArgumentException("Status is required");
-
-        }
         Booking booking =toEntity(bookingDto);
         Booking savedBooking = bookingRepository.save(booking);
         return toDto(savedBooking);

@@ -17,5 +17,7 @@ public record BookingDto(
         Integer flightId,
 
         Instant bookingTime,
+
+        @NotNull(message = "Status cant be ull")
         BookingStatus status
 ) {}
