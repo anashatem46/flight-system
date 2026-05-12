@@ -1,21 +1,20 @@
 package org.learnjava.flightsystem.user.service;
 
-import org.learnjava.flightsystem.user.DTO.UserDto;
-import org.learnjava.flightsystem.user.entity.User;
+import org.learnjava.flightsystem.user.dto.UserDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
-    Optional<UserDto> addUser(UserDto userDto);
+
+    UserDto createUser(UserDto userDto);
 
     UserDto getUserById(Integer userId);
 
-    Optional<UserDto> getUserByEmail(String email);
+    UserDto getUserByEmail(String email);
 
     List<UserDto> getUsers();
 
-    User authenticate(String username, String password);
+    UserDto updateUser(Integer userId, UserDto userDto);
 
-
+    void deleteUser(Integer userId);
 }

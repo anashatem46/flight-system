@@ -17,8 +17,8 @@ import java.time.Instant;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_gen")
-    @SequenceGenerator(name = "users_id_gen", sequenceName = "users_user_id_seq", allocationSize = 1)
-    @Column(name = "user_id", nullable = false)
+    @SequenceGenerator(name = "users_id_gen", sequenceName = "users_id_seq", allocationSize = 1)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
 
@@ -28,11 +28,6 @@ public class User {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
-
-    @Column(name = "authorities", nullable = false)
-    private String authorities;
 
     @Builder.Default
     @Column(name = "created_at")
@@ -42,9 +37,5 @@ public class User {
     @Column(name = "updated_at")
     private Instant updatedAt = Instant.now();
 
-
-    public String getPassword() {
-        return passwordHash;
-    }
 
 }

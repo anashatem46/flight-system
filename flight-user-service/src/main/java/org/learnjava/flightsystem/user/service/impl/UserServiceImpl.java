@@ -1,70 +1,84 @@
 package org.learnjava.flightsystem.user.service.impl;
 
-import lombok.AllArgsConstructor;
-import org.learnjava.flightsystem.user.DTO.UserDto;
+import lombok.RequiredArgsConstructor;
+import org.learnjava.flightsystem.user.dto.UserDto;
 import org.learnjava.flightsystem.user.entity.User;
 import org.learnjava.flightsystem.user.exceptions.UserApiException;
 import org.learnjava.flightsystem.user.mapper.UserMapper;
 import org.learnjava.flightsystem.user.repo.UserRepo;
 import org.learnjava.flightsystem.user.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-@AllArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private UserRepo userRepo;
-    private UserMapper userMapper;
-    private PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
 
+    private final UserRepo userRepo;
+    private final UserMapper userMapper;
 
     @Override
-    public Optional<UserDto> addUser(UserDto userDto) {
-        String password = userDto.password();
-        if (password == null || password.isBlank()) {
-            throw new UserApiException("password Can't be empty", HttpStatus.BAD_REQUEST);
+    public UserDto createUser(UserDto userDto) {
+
+        if (userRepo.existsByEmail(userDto.email())) {
+            throw new UserApiException("Email already exists", HttpStatus.BAD_REQUEST);
         }
-        var hashedPassword = passwordEncoder.encode(password);
 
-        var udto = new UserDto(userDto.id(), userDto.email(), userDto.username(), hashedPassword);
+        User user = userMapper.convertToUserEntity(userDto);
+        User savedUser = userRepo.save(user);
 
-        User savedUser = userRepo.save(userMapper.convertToUserEntity(udto));
-
-        return Optional.of(userMapper.convertToUserDto(savedUser));
-
+        return userMapper.convertToUserDto(savedUser);
     }
 
     @Override
     public UserDto getUserById(Integer userId) {
-        Optional<User> user = userRepo.findById(userId);
-        return user.map(userMapper::convertToUserDto)
+        User user = userRepo.findById(userId)
                 .orElseThrow(() -> new UserApiException("User not found", HttpStatus.NOT_FOUND));
+
+        return userMapper.convertToUserDto(user);
     }
 
     @Override
-    public Optional<UserDto> getUserByEmail(String email) {
-        return userRepo.findByEmail(email)
-                .map(userMapper::convertToUserDto);
+    public UserDto getUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UserApiException("User not found", HttpStatus.NOT_FOUND));
+
+        return userMapper.convertToUserDto(user);
     }
 
     @Override
     public List<UserDto> getUsers() {
-        return userRepo.findAll().stream()
+        return userRepo.findAll()
+                .stream()
                 .map(userMapper::convertToUserDto)
                 .toList();
     }
 
     @Override
-    public User authenticate(String username, String password) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
+    public UserDto updateUser(Integer userId, UserDto userDto) {
+        User existingUser = userRepo.findById(userId)
+                .orElseThrow(() -> new UserApiException("User not found", HttpStatus.NOT_FOUND));
 
-        return userRepo.findByUsername(username).orElseThrow();
+        if (!existingUser.getEmail().equals(userDto.email())
+                && userRepo.existsByEmail(userDto.email())) {
+            throw new UserApiException("Email already exists", HttpStatus.BAD_REQUEST);
+        }
+
+        existingUser.setEmail(userDto.email());
+        existingUser.setUsername(userDto.username());
+
+        User updatedUser = userRepo.save(existingUser);
+
+        return userMapper.convertToUserDto(updatedUser);
+    }
+
+    @Override
+    public void deleteUser(Integer userId) {
+        User existingUser = userRepo.findById(userId)
+                .orElseThrow(() -> new UserApiException("User not found", HttpStatus.NOT_FOUND));
+
+        userRepo.delete(existingUser);
     }
 }
-
