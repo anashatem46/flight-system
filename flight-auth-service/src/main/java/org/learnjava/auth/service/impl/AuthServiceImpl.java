@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.learnjava.auth.client.UserServiceClient;
 import org.learnjava.auth.config.JwtService;
 import org.learnjava.auth.dto.*;
+import org.learnjava.auth.exception.InvalidCredentialsException;
+import org.learnjava.auth.exception.UserServiceException;
 import org.learnjava.auth.service.AuthService;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
-        String passwordHash =  passwordEncoder.encode(request.password());
+        String passwordHash = passwordEncoder.encode(request.password());
 
         CreateUserRequest createUserRequest = new CreateUserRequest(
                 request.username(),
@@ -36,17 +40,27 @@ public class AuthServiceImpl implements AuthService {
         UserAuthResponse user = userServiceClient.findByEmail(request.email());
         String token = jwtService.generateToken(user);
 
-        return new AuthResponse(token,TOKEN_TYPE);
+        return new AuthResponse(token, TOKEN_TYPE);
     }
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password()
+                    )
+            );
+        } catch (InternalAuthenticationServiceException exception) {
+            if (exception.getCause() instanceof UserServiceException userServiceException) {
+                throw userServiceException;
+            }
+            throw new UserServiceException("Authentication service unavailable", exception);
+        } catch (AuthenticationException exception) {
+            throw new InvalidCredentialsException();
+        }
+
 
         UserAuthResponse user = userServiceClient.findByEmail(request.email());
 

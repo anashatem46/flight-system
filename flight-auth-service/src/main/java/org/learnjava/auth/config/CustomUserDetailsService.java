@@ -3,6 +3,7 @@ package org.learnjava.auth.config;
 import lombok.RequiredArgsConstructor;
 import org.learnjava.auth.client.UserServiceClient;
 import org.learnjava.auth.dto.UserAuthResponse;
+import org.learnjava.auth.exception.UserNotFoundException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     .authorities(user.role())
                     .build();
 
-        } catch (Exception exception) {
+        } catch (UserNotFoundException exception) {
             throw new UsernameNotFoundException("User not found with email: " + email, exception);
         }
     }
