@@ -12,10 +12,10 @@ public final class ApiResponseUtils {
         return ResponseEntity.ok(new ApiResponse<>(true, message, data));
     }
 
-    public static <T> ResponseEntity<ApiResponse<T>> created(String message, T data) {
+    public static ResponseEntity<ApiResponse<Void>> createdWithoutData(String message) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, message, data));
+                .body(new ApiResponse<>(true, message, null));
     }
 
     public static ResponseEntity<ApiResponse<Void>> successWithoutData(String message) {

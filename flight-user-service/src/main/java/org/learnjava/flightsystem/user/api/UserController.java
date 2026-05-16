@@ -18,14 +18,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<UserDto>> createUser(
-            @Valid @RequestBody UserDto userDto
-    ) {
-        UserDto createdUser = userService.createUser(userDto);
-        return created("User created successfully", createdUser);
-    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {
         List<UserDto> users = userService.getUsers();

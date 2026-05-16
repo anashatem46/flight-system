@@ -1,12 +1,12 @@
 package org.learnjava.flightsystem.user.service;
 
+import org.learnjava.flightsystem.user.dto.CreateUserRequest;
+import org.learnjava.flightsystem.user.dto.UserAuthResponse;
 import org.learnjava.flightsystem.user.dto.UserDto;
 
 import java.util.List;
 
 public interface UserService {
-
-    UserDto createUser(UserDto userDto);
 
     UserDto getUserById(Integer userId);
 
@@ -17,4 +17,8 @@ public interface UserService {
     UserDto updateUser(Integer userId, UserDto userDto);
 
     void deleteUser(Integer userId);
+
+    UserAuthResponse createUserForAuth(CreateUserRequest request);
+
+    UserAuthResponse getUserByEmailForAuth(String email);
 }

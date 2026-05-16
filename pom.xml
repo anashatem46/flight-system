@@ -13,6 +13,7 @@
     <modules>
         <module>flight-user-service</module>
         <module>flight-booking-service</module>
+        <module>flight-auth-service</module>
     </modules>
 
 </project>
