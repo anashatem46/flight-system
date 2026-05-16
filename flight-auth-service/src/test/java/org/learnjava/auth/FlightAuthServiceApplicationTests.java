@@ -1,4 +1,4 @@
-package org.learnjava.flightauthservice;
+package org.learnjava.auth;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

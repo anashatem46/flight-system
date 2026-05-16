@@ -1,28 +1,23 @@
 server:
   port: 8085
+
 spring:
   application:
     name: flight-auth-service
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/flight_auth_db
-    username:
-    password:
-    driver-class-name:
 
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+services:
+  user-service:
+    base-url: http://localhost:8082
 
-      flyway:
-        enabled: true
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=}
+
+
 
 logging:
   level:
-    org.hibernate.SQL: INFO
     org.learnjava: INFO
