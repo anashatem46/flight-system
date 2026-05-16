@@ -5,6 +5,8 @@ import org.learnjava.auth.client.UserServiceClient;
 import org.learnjava.auth.config.JwtService;
 import org.learnjava.auth.dto.*;
 import org.learnjava.auth.service.AuthService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,7 @@ public class AuthServiceImpl implements AuthService {
     private static final String DEFAULT_ROLE = "ROLE_USER";
     private static final String TOKEN_TYPE = "Bearer";
 
-
+    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -39,16 +41,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest request) {
-        UserAuthResponse user = userServiceClient.findByEmail(request.email());
-
-        boolean passwordMatches = passwordEncoder.matches(
-                request.password(),
-                user.passwordHash()
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password()
+                )
         );
 
-        if (!passwordMatches) {
-            throw new IllegalArgumentException("Invalid email or password");
-        }
+        UserAuthResponse user = userServiceClient.findByEmail(request.email());
 
         String token = jwtService.generateToken(user);
 
