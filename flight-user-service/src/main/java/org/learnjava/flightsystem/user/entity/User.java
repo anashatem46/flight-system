@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.learnjava.flightsystem.user.enums.Role;
 
 import java.time.Instant;
 
@@ -28,6 +29,12 @@ public class User {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 30)
+    private Role role;
 
     @Builder.Default
     @Column(name = "created_at")

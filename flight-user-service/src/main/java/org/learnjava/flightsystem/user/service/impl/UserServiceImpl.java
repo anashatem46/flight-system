@@ -1,6 +1,8 @@
 package org.learnjava.flightsystem.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.learnjava.flightsystem.user.dto.CreateUserRequest;
+import org.learnjava.flightsystem.user.dto.UserAuthResponse;
 import org.learnjava.flightsystem.user.dto.UserDto;
 import org.learnjava.flightsystem.user.entity.User;
 import org.learnjava.flightsystem.user.exceptions.UserApiException;
@@ -80,5 +82,45 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserApiException("User not found", HttpStatus.NOT_FOUND));
 
         userRepo.delete(existingUser);
+    }
+
+    @Override
+    public UserAuthResponse createUserForAuth(CreateUserRequest request) {
+        if (userRepo.existsByEmail(request.email())) {
+            throw new UserApiException("Email already exists", HttpStatus.BAD_REQUEST);
+        }
+
+        if (userRepo.existsByUsername(request.username())) {
+            throw new UserApiException("Username already exists", HttpStatus.BAD_REQUEST);
+        }
+
+        User user = User.builder()
+                .username(request.username())
+                .email(request.email())
+                .passwordHash(request.passwordHash())
+                .role(request.role())
+                .build();
+
+        User savedUser = userRepo.save(user);
+
+        return toUserAuthResponse(savedUser);
+    }
+
+    @Override
+    public UserAuthResponse getUserByEmailForAuth(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new UserApiException("User not found", HttpStatus.NOT_FOUND));
+
+        return toUserAuthResponse(user);
+    }
+
+    private UserAuthResponse toUserAuthResponse(User user) {
+        return new UserAuthResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPasswordHash(),
+                user.getRole()
+        );
     }
 }
