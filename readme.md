@@ -17,61 +17,112 @@ from scratch to understand each layer, pattern, and architectural decision.
 - Lombok
 - MapStruct
 - Spring Security / JWT
-- Spring Cloud Gateway
-- Apache Kafka
 - Docker / Docker Compose
-- Prometheus / Grafana / Jaeger
 
 ---
 
 ## System Architecture
 
-The system is divided into small services. Each service has one main responsibility and owns its own database.
+The current system is split into three Spring Boot services:
+
+- `flight-auth-service` handles registration, login, password hashing, and JWT generation.
+- `flight-user-service` owns user profile and auth lookup data.
+- `flight-booking-service` owns booking data.
+
+Auth does not store users directly. During registration and login it calls protected internal endpoints in
+`flight-user-service`. Those internal endpoints require the shared `X-Internal-Token` header, configured by
+`INTERNAL_SERVICE_TOKEN` in both services.
 
 ![Flight Booking System Architecture](docs/images/flight_booking_system_architecture_diagram.png)
+
+```mermaid
+flowchart LR
+    Client[Client]
+    Auth[flight-auth-service<br/>Port 8085]
+    User[flight-user-service<br/>Port 8082]
+    Booking[flight-booking-service<br/>Port 8081]
+    UserDb[(flight_user_db)]
+    BookingDb[(booking database)]
+
+    Client -->|Register / Login| Auth
+    Client -->|User API| User
+    Client -->|Booking API| Booking
+
+    Auth -->|Internal REST + X-Internal-Token| User
+    User --> UserDb
+    Booking --> BookingDb
+```
 
 ---
 
 ## Services
 
-| Service                       | Responsibility                             |
-|-------------------------------|--------------------------------------------|
-| `flight-gateway-service`      | Single entry point and request routing     |
-| `flight-auth-service`         | Registration, login, password hashing, JWT |
-| `flight-user-service`         | User profile data                          |
-| `flight-search-service`       | Flight search                              |
-| `flight-booking-service`      | Booking management                         |
-| `flight-notification-service` | Kafka-based notifications                  |
+| Service                  | Port | Status      | Responsibility                                                |
+|--------------------------|------|-------------|---------------------------------------------------------------|
+| `flight-auth-service`    | 8085 | Implemented | Registration, login, password hashing, JWT generation         |
+| `flight-user-service`    | 8082 | Implemented | User profiles, auth user lookup, internal user creation       |
+| `flight-booking-service` | 8081 | Implemented | Booking management                                            |
+| `flight-gateway-service` | TBD  | Planned     | Single entry point, request routing, JWT validation           |
+| `flight-search-service`  | TBD  | Planned     | Flight search                                                 |
+| Notification service     | TBD  | Planned     | Asynchronous booking notifications, likely through Kafka      |
+
+---
+
+## Auth Request Flow
+
+The auth service delegates user persistence and lookup to the user service through protected internal endpoints.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Auth as flight-auth-service
+    participant User as flight-user-service
+    participant UserDb as User DB
+
+    Client->>Auth: POST /api/auth/register
+    Auth->>Auth: Hash password
+    Auth->>User: POST /api/v1/users/internal<br/>X-Internal-Token
+    User->>User: Validate internal token
+    User->>UserDb: Save user with password hash and role
+    User-->>Auth: User created
+    Auth->>User: GET /api/v1/users/internal/by-email<br/>X-Internal-Token
+    User->>UserDb: Find user auth data
+    User-->>Auth: UserAuthResponse
+    Auth->>Auth: Generate JWT
+    Auth-->>Client: AuthResponse
+
+    Client->>Auth: POST /api/auth/login
+    Auth->>User: GET /api/v1/users/internal/by-email<br/>X-Internal-Token
+    User-->>Auth: UserAuthResponse
+    Auth->>Auth: Validate password and generate JWT
+    Auth-->>Client: AuthResponse
+```
 
 ---
 
 ## Basic Request Flow
 
-Most requests enter through the gateway, then the gateway routes the request to the correct internal service.
+Until the gateway service is added, clients call the services directly. Once the gateway is implemented, most external
+requests should enter through the gateway and be routed to the correct internal service.
 
 ![Basic Request Flow](docs/images/basic-request-flow.png)
 
----
-
-## Booking Event Flow
-
-Booking notifications are handled asynchronously using Kafka.
-
 ```mermaid
-sequenceDiagram
-    participant Client
-    participant Gateway as flight-gateway-service
-    participant Booking as flight-booking-service
-    participant Kafka as Apache Kafka
-    participant Notification as flight-notification-service
+flowchart LR
+    Client[Client]
+    Gateway[flight-gateway-service<br/>Planned]
+    Auth[flight-auth-service]
+    User[flight-user-service]
+    Booking[flight-booking-service]
 
-    Client->>Gateway: Create booking
-    Gateway->>Booking: Route booking request
-    Booking->>Kafka: Publish BookingCreated event
-    Booking-->>Gateway: Booking response
-    Gateway-->>Client: HTTP response
-    Kafka->>Notification: Consume event
-    Notification->>Notification: Send notification
+    Client -. Future .-> Gateway
+    Gateway -. Route auth .-> Auth
+    Gateway -. Route users .-> User
+    Gateway -. Route bookings .-> Booking
+
+    Client -->|Current direct calls| Auth
+    Client -->|Current direct calls| User
+    Client -->|Current direct calls| Booking
 ```
 
 ---
@@ -83,9 +134,7 @@ flight-system
 ├── flight-booking-service
 ├── flight-user-service
 ├── flight-auth-service
-├── flight-search-service
-├── flight-gateway-service
-├── flight-notification-service
+├── docs
 └── docker-compose.yml
 ```
 
@@ -105,6 +154,12 @@ src/main/java/org/learnjava/flightsystem/user
 
 ---
 
+## Configuration Notes
+
+- `flight-auth-service` reads the user service URL from `services.user-service.base-url`.
+- `flight-auth-service` and `flight-user-service` must use the same `INTERNAL_SERVICE_TOKEN`.
+- `flight-auth-service` signs JWTs with `JWT_SECRET_KEY`.
+- The current local database settings are in each service's `application.yaml`.
 
 
 This project is still under active development.
