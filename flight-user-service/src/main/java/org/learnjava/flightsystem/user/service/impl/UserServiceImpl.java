@@ -22,19 +22,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-
-        if (userRepo.existsByEmail(userDto.email())) {
-            throw new UserApiException("Email already exists", HttpStatus.BAD_REQUEST);
-        }
-
-        User user = userMapper.convertToUserEntity(userDto);
-        User savedUser = userRepo.save(user);
-
-        return userMapper.convertToUserDto(savedUser);
-    }
-
-    @Override
     public UserDto getUserById(Integer userId) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new UserApiException("User not found", HttpStatus.NOT_FOUND));

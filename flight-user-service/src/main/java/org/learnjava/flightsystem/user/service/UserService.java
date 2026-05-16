@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface UserService {
 
-    UserDto createUser(UserDto userDto);
-
     UserDto getUserById(Integer userId);
 
     UserDto getUserByEmail(String email);

@@ -1,0 +1,10 @@
+UPDATE users
+SET role = 'ROLE_USER'
+WHERE role = 'USER';
+
+UPDATE users
+SET role = 'ROLE_ADMIN'
+WHERE role = 'ADMIN';
+
+ALTER TABLE users
+    ALTER COLUMN role SET DEFAULT 'ROLE_USER';
