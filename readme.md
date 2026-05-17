@@ -79,7 +79,7 @@ sequenceDiagram
     participant User as flight-user-service
     participant UserDb as User DB
 
-    Client->>Auth: POST /api/auth/register
+    Client->>Auth: POST /api/v1/auth/register
     Auth->>Auth: Hash password
     Auth->>User: POST /api/v1/users/internal<br/>X-Internal-Token
     User->>User: Validate internal token
@@ -91,7 +91,7 @@ sequenceDiagram
     Auth->>Auth: Generate JWT
     Auth-->>Client: AuthResponse
 
-    Client->>Auth: POST /api/auth/login
+    Client->>Auth: POST /api/v1/auth/login
     Auth->>User: GET /api/v1/users/internal/by-email<br/>X-Internal-Token
     User-->>Auth: UserAuthResponse
     Auth->>Auth: Validate password and generate JWT

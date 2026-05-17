@@ -29,10 +29,10 @@ public class SecurityConfig {
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
 
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
 
-                        .pathMatchers("/api/v1/users/internal/**").permitAll()
+                        .pathMatchers("/api/v1/users/internal", "/api/v1/users/internal/**").permitAll()
                         .pathMatchers("/actuator/health", "/actuator/info").permitAll()
 
                         .anyExchange().authenticated()

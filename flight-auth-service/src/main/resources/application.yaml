@@ -11,13 +11,13 @@ services:
     base-url: http://localhost:8082
 
 internal:
-  token: ${INTERNAL_SERVICE_TOKEN:dev-internal-token}
+  token: ${INTERNAL_SERVICE_TOKEN}
 
 
 application:
   security:
     jwt:
-      secret-key: ${JWT_SECRET_KEY:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=}
+      secret-key: ${JWT_SECRET_KEY}
 
 
 
