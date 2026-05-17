@@ -14,7 +14,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -51,7 +51,7 @@ public class SecurityConfig {
             String jwtSecret
     ) {
         SecretKey secretKey = new SecretKeySpec(
-                jwtSecret.getBytes(StandardCharsets.UTF_8),
+                Base64.getDecoder().decode(jwtSecret),
                 "HmacSHA256"
         );
 
