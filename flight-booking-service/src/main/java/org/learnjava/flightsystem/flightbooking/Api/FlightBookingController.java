@@ -3,9 +3,7 @@ package org.learnjava.flightsystem.flightbooking.Api;
 
 import jakarta.validation.Valid;
 import org.learnjava.flightsystem.flightbooking.dto.BookingDto;
-import org.learnjava.flightsystem.flightbooking.entity.Booking;
 import org.learnjava.flightsystem.flightbooking.service.BookingService;
-import org.learnjava.flightsystem.flightbooking.service.impl.FlightBookingServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/booking")
+@RequestMapping("/api/v1/bookings")
 public class FlightBookingController {
     private  final BookingService flightBookingService;
 
@@ -22,7 +20,7 @@ public class FlightBookingController {
         this.flightBookingService = flightBookingService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public List<BookingDto> getAllBookings(){
         return flightBookingService.getAllBookings();
 

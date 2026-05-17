@@ -14,6 +14,7 @@
         <module>flight-user-service</module>
         <module>flight-booking-service</module>
         <module>flight-auth-service</module>
+        <module>flight-gateway-service</module>
     </modules>
 
 </project>
