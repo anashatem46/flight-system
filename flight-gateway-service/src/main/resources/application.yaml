@@ -27,14 +27,20 @@ spring:
             - id: flight-user-service
               uri: http://localhost:8082
               predicates:
-                - Path=/api/v1/users/
+                - Path=/api/v1/users/**
 
             - id: flight-booking-service
               uri: http://localhost:8081
               predicates:
-                - Path=/api/bookings/
+                - Path=/api/bookings/**
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
